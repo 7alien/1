@@ -1,12 +1,13 @@
 <script>
-  const correct = "hahaha";
-  const input = prompt("pass");
-  if (input !== correct) {
-    document.write("no");
-    throw new Error("no");
+  const correctPassword = "titok";
+  const userInput = prompt("Írd be a jelszót:");
+
+  if (userInput !== correctPassword) {
+    document.body.innerHTML = "<h1>Hozzáférés megtagadva.</h1>";
+    // Ha akarod, leállíthatod a további script futását is
+    throw new Error("Helytelen jelszó vagy megszakítás");
   }
 </script>
-
 <script type="text/javascript">
         var gk_isXlsx = false;
         var gk_xlsxFileLookup = {};
