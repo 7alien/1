@@ -193,19 +193,19 @@
 </head>
 <body>
     <script>
-    const correctPassword = "titok";
+    const correctPassword = "haha";
 
     // Alapból rejtve van az oldal, csak script után jelenik meg
     document.body.style.display = "none";
 
-    const userInput = prompt("Írd be a jelszótx:");
+    const userInput = prompt("pass:");
 
     if (userInput === correctPassword) {
       // Ha helyes a jelszó, mutatjuk az oldalt
       document.body.style.display = "block";
     } else {
       // Ha nem jó vagy cancel, csak üzenetet mutatunk
-      document.body.innerHTML = "<h1>Hozzáférés megtagadva.</h1>";
+      document.body.innerHTML = "<h1></h1>";
     }
   </script>
     <div class="container">
