@@ -1,0 +1,598 @@
+<script>
+  const correct = "hahaha";
+  const input = prompt("pass");
+  if (input !== correct) {
+    document.write("no");
+    throw new Error("no");
+  }
+</script>
+
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A végidők története</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            font-weight: 400;
+            background: #ffffff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            color: #1e293b;
+        }
+        .container {
+            max-width: 900px;
+            width: 90%;
+            margin: 40px auto;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+        h1 {
+            text-align: center;
+            color: #1e293b;
+            font-size: 2.4em;
+            margin: 0 0 30px;
+            font-weight: 400;
+        }
+        .main-menu {
+            margin-bottom: 20px;
+            border-radius: 7px;
+            overflow: hidden;
+        }
+        .main-menu-header {
+            background: linear-gradient(90deg, #5a9cff 0%, #3b82f6 100%);
+            color: #fff;
+            padding: 18px;
+            cursor: pointer;
+            font-size: 1.4em;
+            border-radius: 7px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+            transition: background 0.7s ease-in-out, opacity 0.3s ease-in-out;
+        }
+        .main-menu-header:hover {
+            opacity: 0.9;
+        }
+        .main-menu-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.7s ease-in-out;
+            background: #ffffff;
+            border-radius: 5px;
+        }
+        .main-menu-content.open {
+            max-height: 4000px;
+        }
+        .main-menu-content.intro-content,
+        .main-menu-content.covenant-content {
+            margin: 0 10px;
+        }
+        .sub-menu {
+            margin: 15px 10px;
+            border-left: 4px solid #5a9cff;
+            padding-left: 20px;
+        }
+        .sub-menu-header {
+            background: #ffffff;
+            color: #1e293b;
+            padding: 12px;
+            cursor: pointer;
+            font-size: 1.2em;
+            border-radius: 5px;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.1);
+            transition: opacity 0.3s ease-in-out;
+        }
+        .sub-menu-header:hover {
+            opacity: 0.9;
+        }
+        .sub-menu-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.7s ease-in-out;
+            background: #ffffff;
+            border-radius: 5px;
+        }
+        .sub-menu-content.open {
+            max-height: 2000px;
+        }
+        .verse-link {
+            color: #5a9cff;
+            text-decoration: none;
+            cursor: pointer;
+            font-weight: 400;
+            transition: color 0.3s ease-in-out;
+        }
+        .verse-link:hover {
+            color: #3b82f6;
+            text-decoration: underline;
+        }
+        .verse-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.7s ease-in-out;
+            background: #e6e9ed;
+            border-radius: 5px;
+            border-left: 6px solid #5a9cff;
+            margin: 10px 0;
+        }
+        .verse-content.open {
+            max-height: 500px;
+        }
+        .verse-content a {
+            color: #5a9cff;
+            text-decoration: none;
+            font-weight: 400;
+        }
+        .verse-content a:hover {
+            text-decoration: underline;
+        }
+        p {
+            line-height: 1.5;
+            color: #1e293b;
+            margin: 10px 0;
+            font-weight: 400;
+        }
+        @media (max-width: 600px) {
+            .container {
+                width: 95%;
+                padding: 20px;
+                margin: 20px auto;
+            }
+            .main-menu-header {
+                font-size: 1.2em;
+                padding: 14px;
+            }
+            .sub-menu-header {
+                font-size: 1.1em;
+                padding: 10px;
+            }
+            h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>A végidők története</h1>
+
+        <div class="main-menu">
+            <div class="main-menu-header">Bevezetés: A végidők nemzedéke</div>
+            <div class="main-menu-content intro-content">
+                <p>Az emberiség történelmének sorsdöntő időszaka közeledik, amikor háborúk, éhínségek, földrengések és a szent helyen felállított pusztító utálatosság jelzik Isten ítéletének eljövetelét, és a végidők nemzedékének választania kell, Isten mellé áll-e. Ez az időszak a bibliai próféciák beteljesedésének kezdete, mert Jézus szerint ez a nemzedék nem múlik el, amíg minden meg nem történik (<span class="verse-link" data-verse="Máté 24:34">Máté 24:34</span>).</p>
+                <div class="verse-content" id="verse-Máté 24:34">
+                    <p><a href="https://wol.jw.org/hu/wol/b/r17/lp-h/nwtsty/40/24#study=discover&v=40:24:34" target="_blank">Máté 24:34</a></p>
+                    <p>Bizony mondom nektek, hogy ez a nemzedék semmiképpen sem múlik el, amíg mindezek meg nem történnek.</p>
+                </div>
+                <p>Ez a bevezető az események előtt áll, mert összefoglalja a végidők tétjét és a nemzedék szerepét.</p>
+                <p>Egy angyal minden nemzetet Isten félelmére hív, mert elérkezett az ítélet órája, amely döntésre kényszerít mindenkit (<span class="verse-link" data-verse="Jelenések 14:6–7">Jelenések 14:6–7</span>).</p>
+                <div class="verse-content" id="verse-Jelenések 14:6–7">
+                    <p><a href="https://wol.jw.org/hu/wol/b/r17/lp-h/nwtsty/66/14#study=discover&v=66:14:6-66:14:7" target="_blank">Jelenések 14:6–7</a></p>
+                    <p>És láttam egy másik angyalt az ég közepén repülni, akinél az örökkévaló jó hír volt... és nagy hangon ezt mondta: „Féljétek az Istent...”</p>
+                </div>
+                <p>Aki szándékosan szembefordul Isten Szentlelkével, az végleg elutasítja a bocsánatot, hiszen ez a lázadás visszafordíthatatlan (<span class="verse-link" data-verse="Máté 12:31–32">Máté 12:31–32</span>).</p>
+                <div class="verse-content" id="verse-Máté 12:31–32">
+                    <p><a href="https://wol.jw.org/hu/wol/b/r17/lp-h/nwtsty/40/12#study=discover&v=40:12:31-40:12:32" target="_blank">Máté 12:31–32</a></p>
+                    <p>Ezért mondom nektek: Minden bűnt és káromlást megbocsátanak az embereknek, de a Szellem elleni káromlást nem bocsátják meg.</p>
+                </div>
+                <p>Armageddonban Krisztus kardja elpusztítja a gonoszokat, akik nem részesülnek feltámadásban, mert tetteik végleg elítélik őket (<span class="verse-link" data-verse="Jelenések 19:21">Jelenések 19:21</span>).</p>
+                <div class="verse-content" id="verse-Jelenések 19:21">
+                    <p><a href="https://wol.jw.org/hu/wol/b/r17/lp-h/nwtsty/66/19#study=discover&v=66:19:21" target="_blank">Jelenések 19:21</a></p>
+                    <p>A többieket pedig megölték a lovon ülő szájából kijövő karddal...</p>
+                </div>
+                <p>Dániel szerint sokan feltámadnak, az igazak örök életre, a gonoszok gyalázatra, tetteik alapján (<span class="verse-link" data-verse="Dániel 12:2">Dániel 12:2</span>).</p>
+                <div class="verse-content" id="verse-Dániel 12:2">
+                    <p><a href="https://wol.jw.org/hu/wol/b/r17/lp-h/nwtsty/27/12#study=discover&v=27:12:2" target="_blank">Dániel 12:2</a></p>
+                    <p>Sokan, akik a föld porában alszanak, felébrednek... az egyik részük örökkévaló életre, a többiek gyalázatra...</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-menu">
+            <div class="main-menu-header">Szövetségkötés (0. nap)</div>
+            <div class="main-menu-content covenant-content">
+                <p>A végidők egy jelentős szövetségkötéssel kezdődnek, amely Izrael népét és Jeruzsálem szent városát érinti, amikor egy nagy hatalmú vezető hét évre szóló szövetséget köt, amely békét ígér, de később, a Biblia alapján, megszegik. Ez az esemény indítja el a végidők idővonalát, mert a szövetség meghatározza a következő hét év eseményeit (<span class="verse-link" data-verse="Dániel 9:27">Dániel 9:27</span>).</p>
+                <div class="verse-content" id="verse-Dániel 9:27">
+                    <p><a href="https://wol.jw.org/hu/wol/b/r17/lp-h/nwtsty/27/9#study=discover&v=27:9:27" target="_blank">Dániel 9:27</a></p>
+                    <p>És egy hétig erős szövetséget köt sokakkal...</p>
+                </div>
+                <p>Ez az esemény az időrend elején áll, mert a szövetségkötés a végidők kiindulópontja.</p>
+                <p>A szövetség Izraelre és a jeruzsálemi templomra irányul, amelynek későbbi megszentségtelenítése kulcsfontosságú (<span class="verse-link" data-verse="Dániel 9:24">Dániel 9:24</span>).</p>
+                <div class="verse-content" id="verse-Dániel 9:24">
+                    <p><a href="https://wol.jw.org/hu/wol/b/r17/lp-h/nwtsty/27/9#study=discover&v=27:9:24" target="_blank">Dániel 9:24</a></p>
+                    <p>Hetven hét van elrendelve népedre és szent városodra...</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-menu">
+            <div class="main-menu-header">Első 3,5 év (0–1260. nap)</div>
+            <div class="main-menu-content">
+                <div class="sub-menu">
+                    <div class="sub-menu-header">Háborúk és csapások</div>
+                    <div class="sub-menu-content">
+                        <p>A szövetségkötés után háborúk, éhínségek és földrengések, amelyeket Jézus „szülési fájdalmaknak” nevezett, sújtják a földet, jelezve Isten ítéletének közeledtét. Ezek az események az első 3,5 évre jellemzőek, mert a globális káosz a szövetségkötés utáni instabilitást tükrözi (<span class="verse-link" data-verse="Máté 24:6–8">Máté 24:6–8</span>).</p>
+                        <div class="verse-content" id="verse-Máté 24:6–8">
+                            <p><a href="https://wol.jw.org/hu/wol/b/r17/lp-h/nwtsty/40/24#study=discover&v=40:24:6-40:24:8" target="_blank">Máté 24:6–8</a></p>
+                            <p>Háborúkról és háborús hírekről fogtok hallani... mindez a szülési fájdalmak kezdete.</p>
+                        </div>
+                        <p>Ez az almenüpont az első 3,5 év elejére illik, mert a zűrzavar a szövetségkötés közvetlen következménye.</p>
+                    </div>
+                </div>
+                <div class="sub-menu">
+                    <div class="sub-menu-header">Hatalmak harca</div>
+                    <div class="sub-menu-content">
+                        <p>Az „északi” és „déli” királyok, valószínűleg globális hatalmak, heves harcokba keverednek, országokat hódítanak meg, és destabilizálják a világot. Ez az időszak az első 3,5 évre esik, mert a Biblia szerint a politikai konfliktusok a szövetségkötés utáni átrendeződést mutatják (<span class="verse-link" data-verse="Dániel 11:40">Dániel 11:40</span>).</p>
+                        <div class="verse-content" id="verse-Dániel 11:40">
+                            <p><a href="https://wol.jw.org/hu/wol/b/r17/lp-h/nwtsty/27/11#study=discover&v=27:11:40" target="_blank">Dániel 11:40</a></p>
+                            <p>És az idő végén az északi király összecsap a déli királlyal...</p>
+                        </div>
+                        <p>Ez az esemény az első 3,5 év közepére helyezhető, mert a hatalmi harcok a globális zűrzavar részét képezik.</p>
+                    </div>
+                </div>
+                <div class="sub-menu">
+                    <div class="sub-menu-header">Hamis béke és vallások bukása</div>
+                    <div class="sub-menu-content">
+                        <p>A világ vezetői hamis „békesség és biztonság” ígéretével csábítják az emberiséget, de a fenevad, a Biblia alapján, elpusztítja a hamis vallásokat, amelyeket Babilon, a nagy paráznához hasonlít. Ez az esemény az első 3,5 év végéhez közeledik, mert a vallási rendszerek bukása a fenevad hatalomra jutását előzi meg (<span class="verse-link" data-verse="1Thesszalonika 5:3">1Thesszalonika 5:3</span>).</p>
+                        <div class="verse-content" id="verse-1Thesszalonika 5:3">
+                            <p><a href="https://wol.jw.org/hu/wol/b/r17/lp-h/nwtsty/52/5#study=discover&v=52:5:3" target="_blank">1Thesszalonika 5:3</a></p>
+                            <p>Amikor az emberek azt mondják: „Béke és biztonság!”, akkor hirtelen pusztulás éri őket...</p>
+                        </div>
+                        <p>Ez az almenüpont az első 3,5 év későbbi szakaszára illik, mert a fenevad cselekedetei a fordulópont előtt csúcsosodnak ki.</p>
+                    </div>
+                </div>
+                <div class="sub-menu">
+                    <div class="sub-menu-header">Az evangélium terjedése</div>
+                    <div class="sub-menu-content">
+                        <p>Isten hűséges szolgái minden nemzetnek hirdetik a Királyság evangéliumát, teljesítve Jézus parancsát, hogy a jó hírt az egész földön terjesszék. Ez az első 3,5 év alatt zajlik, mert a prédikálás a nagy nyomorúság előtt éri el csúcspontját (<span class="verse-link" data-verse="Máté 24:14">Máté 24:14</span>).</p>
+                        <div class="verse-content" id="verse-Máté 24:14">
+                            <p><a href="https://wol.jw.org/hu/wol/b/r17/lp-h/nwtsty/40/24#study=discover&v=40:24:14" target="_blank">Máté 24:14</a></p>
+                            <p>És prédikálják a királyság jó hírét az egész lakott földön...</p>
+                        </div>
+                        <p>Ez az esemény az első 3,5 év egészére kiterjed, mert a prédikálás párhuzamosan zajlik a többi eseménnyel.</p>
+                    </div>
+                </div>
+                <div class="sub-menu">
+                    <div class="sub-menu-header">A két tanú szolgálata</div>
+                    <div class="sub-menu-content">
+                        <p>Isten két tanúja prófétál, csodákat tesz, például tüzet hoz az égből, és gyötrelmet okoz a világnak, hirdetve Isten akaratát. Szolgálatuk az első 3,5 évre esik, mert a Biblia szerint prófétai tevékenységük a fordulópont előtti figyelmeztetés része (<span class="verse-link" data-verse="Jelenések 11:3">Jelenések 11:3</span>).</p>
+                        <div class="verse-content" id="verse-Jelenések 11:3">
+                            <p><a href="https://wol.jw.org/hu/wol/b/r17/lp-h/nwtsty/66/11#study=discover&v=66:11:3" target="_blank">Jelenések 11:3</a></p>
+                            <p>És adok két tanúmnak, hogy prófétáljanak...</p>
+                        </div>
+                        <p>Ez az almenüpont az első 3,5 évre illik, mert a két tanú a nagy nyomorúság előtt teljesíti küldetését.</p>
+                    </div>
+                </div>
+                <div class="sub-menu">
+                    <div class="sub-menu-header">A 144 000 megpecsételése</div>
+                    <div class="sub-menu-content">
+                        <p>Isten megpecsétel 144 000 hűséges követőt Izrael tizenkét törzséből, akik védelmet kapnak a közelgő csapások ellen. Ez valószínűleg az első 3,5 év alatt történik, mert a Biblia szerint a megpecsételés a trombitacsapások előtt zajlik (<span class="verse-link" data-verse="Jelenések 7:3–4">Jelenések 7:3–4</span>).</p>
+                        <div class="verse-content" id="verse-Jelenések 7:3–4">
+                            <p><a href="https://wol.jw.org/hu/wol/b/r17/lp-h/nwtsty/66/7#study=discover&v=66:7:3-66:7:4" target="_blank">Jelenések 7:3–4</a></p>
+                            <p>Ne ártsatok se a földnek... amíg meg nem pecsételjük Istenünk szolgáinak homlokát...</p>
+                        </div>
+                        <p>Ez az almenüpont az első 3,5 év elejére helyezhető, mert a megpecsételés logikusan a csapások előtt szükséges.</p>
+                    </div>
+                </div>
+                <div class="sub-menu">
+                    <div class="sub-menu-header">Az asszony menedéke</div>
+                    <div class="sub-menu-content">
+                        <p>Isten népe, akit a Biblia „asszonyként” ábrázol, a pusztába menekül, ahol Isten 1260 napig táplálja és védi a sátáni támadásoktól, például a kígyó „árvizétől”. Ez az első 3,5 év alatt zajlik, mert a menekülés a szövetségkötés utáni üldöztetésre válasz (<span class="verse-link" data-verse="Jelenések 12:6">Jelenések 12:6</span>).</p>
+                        <div class="verse-content" id="verse-Jelenések 12:6">
+                            <p><a href="https://wol.jw.org/hu/wol/b/r17/lp-h/nwtsty/66/12#study=discover&v=66:12:6" target="_blank">Jelenések 12:6</a></p>
+                            <p>És az asszony a pusztába menekült, ahol Istentől készített helye van...</p>
+                        </div>
+                        <p>Ez az esemény az első 3,5 évre illik, mert az asszony védelme a nagy nyomorúság előtt szükséges.</p>
+                    </div>
+                </div>
+                <div class="sub-menu">
+                    <div class="sub-menu-header">A hét trombita</div>
+                    <div class="sub-menu-content">
+                        <p>Isten figyelmeztető csapásai, a hét trombita, pusztítást hoznak: tűz és jégeső égeti a földet, a tenger vérré válik, csillag hull a vizekre, és démoni erők szabadulnak fel. Ezek valószínűleg az első 3,5 év végén csúcsosodnak ki, mert a Biblia szerint a trombiták a nagy nyomorúság előtti figyelmeztetések (<span class="verse-link" data-verse="Jelenések 8:6–7">Jelenések 8:6–7</span>).</p>
+                        <div class="verse-content" id="verse-Jelenések 8:6–7">
+                            <p><a href="https://wol.jw.org/hu/wol/b/r17/lp-h/nwtsty/66/8#study=discover&v=66:8:6-66:8:7" target="_blank">Jelenések 8:6–7</a></p>
+                            <p>És a hét angyal... elkészült, hogy megfújja a trombitákat.</p>
+                        </div>
+                        <p>Ez az almenüpont az első 3,5 év második felére esik, mert a trombiták az utolsó jelek a fordulópont előtt.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-menu">
+            <div class="main-menu-header">Fordulópont (1260. nap)</div>
+            <div class="main-menu-content">
+                <div class="sub-menu">
+                    <div class="sub-menu-header">A szövetség megszegése</div>
+                    <div class="sub-menu-content">
+                        <p>A szövetség felénél, a 1260. napon a szentély áldozatai megszűnnek, és a pusztító utálatosság felállítása elindítja a nagy nyomorúságot, amely Jézus szerint példátlan szenvedést hoz. Ez az esemény a fordulópont része, mert a Biblia szerint a szövetség megszegése új korszakot nyit (<span class="verse-link" data-verse="Máté 24:21">Máté 24:21</span>).</p>
+                        <div class="verse-content" id="verse-Máté 24:21">
+                            <p><a href="https://wol.jw.org/hu/wol/b/r17/lp-h/nwtsty/40/24#study=discover&v=40:24:21" target="_blank">Máté 24:21</a></p>
+                            <p>Mert akkor nagy nyomorúság lesz, amilyen még nem volt...</p>
+                        </div>
+                        <p>Ez az almenüpont pontosan a 1260. napra illik, mert a szövetség megszegése a nagy nyomorúság kezdete.</p>
+                    </div>
+                </div>
+                <div class="sub-menu">
+                    <div class="sub-menu-header">Szentély megszentségtelenítése</div>
+                    <div class="sub-menu-content">
+                        <p>A 1260. napon a jeruzsálemi szentélyben megszűnnek az áldozatok, és a pusztító utálatosságot felállítják, amely a templom megszentségtelenítését és a nagy nyomorúság kezdetét jelzi. Ez a fordulópont része, mert a Biblia szerint a pusztító utálatosság felállítása a szövetség megszegésével egy időben történik (<span class="verse-link" data-verse="Máté 24:15">Máté 24:15</span>).</p>
+                        <div class="verse-content" id="verse-Máté 24:15">
+                            <p><a href="https://wol.jw.org/hu/wol/b/r17/lp-h/nwtsty/40/24#study=discover&v=40:24:15" target="_blank">Máté 24:15</a></p>
+                            <p>Amikor tehát meglátjátok a pusztító utálatosságot...</p>
+                        </div>
+                        <p>Ez az almenüpont a 1260. napra illik, mert Dániel szerint a pusztító utálatosság a szövetség felének időpontjára esik.</p>
+                    </div>
+                </div>
+                <div class="sub-menu">
+                    <div class="sub-menu-header">Menekülés a pusztába</div>
+                    <div class="sub-menu-content">
+                        <p>Isten népe Júdeából a hegyekbe menekül, az „asszony” pedig a pusztában talál menedéket, ahol Isten oltalmazza a sátáni üldöztetéstől. Ez a fordulópont idején történik, mert a Biblia szerint a menekülés a pusztító utálatosság felállítására válasz (<span class="verse-link" data-verse="Jelenések 12:14">Jelenések 12:14</span>).</p>
+                        <div class="verse-content" id="verse-Jelenések 12:14">
+                            <p><a href="https://wol.jw.org/hu/wol/b/r17/lp-h/nwtsty/66/12#study=discover&v=66:12:14" target="_blank">Jelenések 12:14</a></p>
+                            <p>És az asszonynak két nagy sasszárnyat adtak...</p>
+                        </div>
+                        <p>Ez az esemény a 1260. napra esik, mert az üldöztetés a nagy nyomorúság kezdetével indul.</p>
+                    </div>
+                </div>
+                <div class="sub-menu">
+                    <div class="sub-menu-header">A két tanú sorsa</div>
+                    <div class="sub-menu-content">
+                        <p>A fenevad megöli Isten két tanúját, akiknek holttestei három és fél napig hevernek az utcákon, de Isten feltámasztja és az égbe emeli őket. Ez valószínűleg a fordulópont idején történik, mert a Biblia szerint a tanúk halála és feltámadása a nagy nyomorúság kezdetét erősíti meg (<span class="verse-link" data-verse="Jelenések 11:11">Jelenések 11:11</span>).</p>
+                        <div class="verse-content" id="verse-Jelenések 11:11">
+                            <p><a href="https://wol.jw.org/hu/wol/b/r17/lp-h/nwtsty/66/11#study=discover&v=66:11:11" target="_blank">Jelenések 11:11</a></p>
+                            <p>De három és fél nap múlva élet lehelete...</p>
+                        </div>
+                        <p>Ez az almenüpont a 1260. nap körüli időszakra illik, mert a tanúk szolgálata a fordulóponttal zárul.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-menu">
+            <div class="main-menu-header">Második 3,5 év (1260–1290. nap)</div>
+            <div class="main-menu-content">
+                <div class="sub-menu">
+                    <div class="sub-menu-header">A fenevad uralma</div>
+                    <div class="sub-menu-content">
+                        <p>A fenevad, egy sátáni hatalom, teljes uralmat szerez, és mindenkit arra kényszerít, hogy imádja őt vagy életre kelő képmását, különben halállal vagy gazdasági kirekesztéssel kell szembenéznie. Ez a második 3,5 év alatt zajlik, mert a Biblia szerint a fenevad hatalma a nagy nyomorúság idején csúcsosodik ki (<span class="verse-link" data-verse="Jelenések 13:15">Jelenések 13:15</span>).</p>
+                        <div class="verse-content" id="verse-Jelenések 13:15">
+                            <p><a href="https://wol.jw.org/hu/wol/b/r17/lp-h/nwtsty/66/13#study=discover&v=66:13:15" target="_blank">Jelenések 13:15</a></p>
+                            <p>És megadatott neki, hogy... a fenevad képmása beszéljen...</p>
+                        </div>
+                        <p>Ez az almenüpont a második 3,5 év elejére illik, mert a fenevad uralma a fordulópont után azonnal kezdődik.</p>
+                    </div>
+                </div>
+                <div class="sub-menu">
+                    <div class="sub-menu-header">A fenevad bélyege</div>
+                    <div class="sub-menu-content">
+                        <p>A fenevad bélyege, a 666, kötelezővé válik, és nélküle senki sem vásárolhat vagy adhat el, próbára téve az emberiség hűségét. Ez valószínűleg a második 3,5 év közepén történik, mert a Biblia szerint a bélyeg a fenevad uralmának eszköze, de pontos időzítés nem szerepel (<span class="verse-link" data-verse="Jelenések 13:16–18">Jelenések 13:16–18</span>).</p>
+                        <div class="verse-content" id="verse-Jelenések 13:16–18">
+                            <p><a href="https://wol.jw.org/hu/wol/b/r17/lp-h/nwtsty/66/13#study=discover&v=66:13:16-66:13:18" target="_blank">Jelenések 13:16–18</a></p>
+                            <p>És arra kényszerít mindenkit... hogy bélyeget kapjanak...</p>
+                        </div>
+                        <p>Ez az esemény a második 3,5 év közepére helyezhető, mert a bélyeg valószínűleg a fenevad hatalmának megszilárdulását követi.</p>
+                    </div>
+                </div>
+                <div class="sub-menu">
+                    <div class="sub-menu-header">Üldöztetés</div>
+                    <div class="sub-menu-content">
+                        <p>Isten népe heves üldöztetést szenved a fenevad követőitől, akik a Biblia szerint gyötrik a szenteket, és megpróbálják megváltoztatni az időket és a törvényt. Ez a második 3,5 év alatt zajlik, mert az üldöztetés a fenevad uralmának következménye (<span class="verse-link" data-verse="Jelenések 13:7">Jelenések 13:7</span>).</p>
+                        <div class="verse-content" id="verse-Jelenések 13:7">
+                            <p><a href="https://wol.jw.org/hu/wol/b/r17/lp-h/nwtsty/66/13#study=discover&v=66:13:7" target="_blank">Jelenések 13:7</a></p>
+                            <p>És megadatott neki, hogy háborút indítson a szentek ellen...</p>
+                        </div>
+                        <p>Ez az almenüpont a második 3,5 évre illik, mert az üldöztetés a bélyeg bevezetésével párhuzamosan erősödik.</p>
+                    </div>
+                </div>
+                <div class="sub-menu">
+                    <div class="sub-menu-header">Isten haragja</div>
+                    <div class="sub-menu-content">
+                        <p>Isten haragja hét csészében öntetik ki: fekélyek sújtják a bélyeget viselőket, a tenger és folyók vérré válnak, a nap perzsel, sötétség borul a fenevad királyságára, és földrengés dönti romba a városokat. Ez valószínűleg a második 3,5 év vége felé történik, mert a Biblia szerint a haragcsészék az Armageddon előtti büntetések (<span class="verse-link" data-verse="Jelenések 16:1">Jelenések 16:1</span>).</p>
+                        <div class="verse-content" id="verse-Jelenések 16:1">
+                            <p><a href="https://wol.jw.org/hu/wol/b/r17/lp-h/nwtsty/66/16#study=discover&v=66:16:1" target="_blank">Jelenések 16:1</a></p>
+                            <p>És nagy hangot hallottam a szentélyből...</p>
+                        </div>
+                        <p>Ez az esemény a második 3,5 év későbbi szakaszára esik, mert a haragcsészék az Armageddon előkészítései.</p>
+                    </div>
+                </div>
+                <div class="sub-menu">
+                    <div class="sub-menu-header">Angyali figyelmeztetés</div>
+                    <div class="sub-menu-content">
+                        <p>Három angyal figyelmezteti a világot, hogy ne imádják a fenevadat, mert Isten haragja vár rájuk, és hirdetik Babilon bukását, a hamis vallások összeomlását. Ez valószínűleg a második 3,5 év alatt zajlik, mert a Biblia szerint az angyalok üzenete a fenevad uralmának idején hangzik el (<span class="verse-link" data-verse="Jelenések 14:8">Jelenések 14:8</span>).</p>
+                        <div class="verse-content" id="verse-Jelenések 14:8">
+                            <p><a href="https://wol.jw.org/hu/wol/b/r17/lp-h/nwtsty/66/14#study=discover&v=66:14:8" target="_blank">Jelenések 14:8</a></p>
+                            <p>És egy másik, második angyal követte...</p>
+                        </div>
+                        <p>Ez az almenüpont a második 3,5 év közepére illik, mert az angyalok figyelmeztetése valószínűleg az aratás előtt történik.</p>
+                    </div>
+                </div>
+                <div class="sub-menu">
+                    <div class="sub-menu-header">Az aratás</div>
+                    <div class="sub-menu-content">
+                        <p>Az angyalok „aratják” a földet, szétválasztva a hűségeseket, akiket Krisztushoz gyűjtenek, és a gonoszokat, akik Isten haragjának borprésébe kerülnek. Ez valószínűleg a második 3,5 év vége felé történik, mert a Biblia szerint az aratás az Armageddon előtti szétválasztást jelenti (<span class="verse-link" data-verse="Jelenések 14:14">Jelenések 14:14</span>).</p>
+                        <div class="verse-content" id="verse-Jelenések 14:14">
+                            <p><a href="https://wol.jw.org/hu/wol/b/r17/lp-h/nwtsty/66/14#study=discover&v=66:14:14" target="_blank">Jelenések 14:14</a></p>
+                            <p>És láttam, íme, egy fehér felhő...</p>
+                        </div>
+                        <p>Ez az esemény a második 3,5 év végére helyezhető, mert az aratás valószínűleg az Armageddon előtti utolsó lépés.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-menu">
+            <div class="main-menu-header">Armageddon (1290–1335. nap)</div>
+            <div class="main-menu-content">
+                <div class="sub-menu">
+                    <div class="sub-menu-header">A harmadik jaj</div>
+                    <div class="sub-menu-content">
+                        <p>A hetedik trombita, a harmadik jaj, megszólal, és az egekben hangok hirdetik, hogy a világ királyságai Istené és Krisztusé lettek, jelezve Krisztus uralmának kezdetét. Ez valószínűleg a 1290–1335. nap körül történik, mert a Biblia szerint a trombita a végső események nyitánya, de pontos időzítés nem szerepel (<span class="verse-link" data-verse="Jelenések 11:15">Jelenések 11:15</span>).</p>
+                        <div class="verse-content" id="verse-Jelenések 11:15">
+                            <p><a href="https://wol.jw.org/hu/wol/b/r17/lp-h/nwtsty/66/11#study=discover&v=66:11:15" target="_blank">Jelenések 11:15</a></p>
+                            <p>És a hetedik angyal megfújta a trombitát...</p>
+                        </div>
+                        <p>Ez az almenüpont a 1290–1335. napra illik, mert a harmadik jaj valószínűleg az Armageddon eseményeinek kezdete.</p>
+                    </div>
+                </div>
+                <div class="sub-menu">
+                    <div class="sub-menu-header">Összegyűjtés</div>
+                    <div class="sub-menu-content">
+                        <p>Az angyalok trombitaszóval gyűjtik össze a választottakat a föld minden részéről és a gonoszokat Harmagedon mezejére, hogy szembenézzenek Isten ítéletével. Ez valószínűleg a 1290–1335. nap körül zajlik, mert a Biblia szerint az összegyűjtés a végső csata előkészítése (<span class="verse-link" data-verse="Máté 24:31">Máté 24:31</span>).</p>
+                        <div class="verse-content" id="verse-Máté 24:31">
+                            <p><a href="https://wol.jw.org/hu/wol/b/r17/lp-h/nwtsty/40/24#study=discover&v=40:24:31" target="_blank">Máté 24:31</a></p>
+                            <p>És elküldi angyalait nagy trombitaszóval...</p>
+                        </div>
+                        <p>Ez az esemény a 1290–1335. napra esik, mert az összegyűjtés valószínűleg közvetlenül az Armageddon előtt történik.</p>
+                    </div>
+                </div>
+                <div class="sub-menu">
+                    <div class="sub-menu-header">A végső háború</div>
+                    <div class="sub-menu-content">
+                        <p>Krisztus, a Királyok Királya, fehér lovon, angyali seregekkel érkezik, és legyőzi a föld királyait, a fenevadat és a hamis prófétát, akik a tüzes tóra vettetnek. Ez valószínűleg a 1290–1335. nap csúcspontján történik, mert a Biblia szerint Armageddon Isten győzelmét hozza el (<span class="verse-link" data-verse="Jelenések 19:20">Jelenések 19:20</span>).</p>
+                        <div class="verse-content" id="verse-Jelenések 19:20">
+                            <p><a href="https://wol.jw.org/hu/wol/b/r17/lp-h/nwtsty/66/19#study=discover&v=66:19:20" target="_blank">Jelenések 19:20</a></p>
+                            <p>De a fenevadat és a hamis prófétát... elfogták.</p>
+                        </div>
+                        <p>Ez az almenüpont a 1290–1335. nap csúcspontjára illik, mert Armageddon a végső összecsapás.</p>
+                    </div>
+                </div>
+                <div class="sub-menu">
+                    <div class="sub-menu-header">Sátán megkötözése</div>
+                    <div class="sub-menu-content">
+                        <p>A háború végén egy angyal láncra veri Sátánt, a mélységbe veti, és lepecsételi ezer évre, hogy ne tévessze meg a nemzeteket. Ez valószínűleg a 1335. nap körül történik, mert a Biblia szerint Sátán megkötözése az Armageddon győzelmét követi (<span class="verse-link" data-verse="Jelenések 20:2">Jelenések 20:2</span>).</p>
+                        <div class="verse-content" id="verse-Jelenések 20:2">
+                            <p><a href="https://wol.jw.org/hu/wol/b/r17/lp-h/nwtsty/66/20#study=discover&v=66:20:2" target="_blank">Jelenések 20:2</a></p>
+                            <p>És megragadta a sárkányt... és megkötözte őt ezer évre.</p>
+                        </div>
+                        <p>Ez az esemény a 1290–1335. nap végére esik, mert Sátán megkötözése valószínűleg a csata lezárását követi.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-menu">
+            <div class="main-menu-header">Ezeréves uralom és végső ítélet</div>
+            <div class="main-menu-content">
+                <div class="sub-menu">
+                    <div class="sub-menu-header">Krisztus uralma</div>
+                    <div class="sub-menu-content">
+                        <p>Krisztus ezer évig uralkodik a feltámadt hűségesekkel, akik papokként és királyokként szolgálnak, miközben a föld békéssé válik, ahol a farkas a báránnyal legel. Ez az Armageddon utáni időszakra esik, mert a Biblia szerint Krisztus uralma a csata győzelmét követi (<span class="verse-link" data-verse="Jelenések 20:4">Jelenések 20:4</span>).</p>
+                        <div class="verse-content" id="verse-Jelenések 20:4">
+                            <p><a href="https://wol.jw.org/hu/wol/b/r17/lp-h/nwtsty/66/20#study=discover&v=66:20:4" target="_blank">Jelenések 20:4</a></p>
+                            <p>És láttam trónokat, és leültek rájuk...</p>
+                        </div>
+                        <p>Ez az almenüpont az Armageddon utáni időszakra illik, mert Krisztus uralma a győzelem után kezdődik.</p>
+                    </div>
+                </div>
+                <div class="sub-menu">
+                    <div class="sub-menu-header">Sátán utolsó próbája</div>
+                    <div class="sub-menu-content">
+                        <p>Az ezer év végén Sátánt elengedik, aki Gógot és Magógot megtévesztve háborút indít Isten népe ellen, de tűz hull az égből, és Sátán a tüzes tóra vettetik. Ez az ezer év végén történik, mert a Biblia szerint Sátán utolsó próbája az uralom lezárása előtt zajlik (<span class="verse-link" data-verse="Jelenések 20:10">Jelenések 20:10</span>).</p>
+                        <div class="verse-content" id="verse-Jelenések 20:10">
+                            <p><a href="https://wol.jw.org/hu/wol/b/r17/lp-h/nwtsty/66/20#study=discover&v=66:20:10" target="_blank">Jelenések 20:10</a></p>
+                            <p>És az ördögöt... a tüzes tóba vetették.</p>
+                        </div>
+                        <p>Ez az esemény az ezeréves uralom végére esik, mert Sátán elengedése az utolsó próbatétel.</p>
+                    </div>
+                </div>
+                <div class="sub-menu">
+                    <div class="sub-menu-header">A végső ítélet</div>
+                    <div class="sub-menu-content">
+                        <p>Minden ember feltámad, és egy nagy fehér trón előtt ítéltetik meg tetteik szerint, amelyeket könyvek rögzítenek; az igazak neve az élet könyvében van, a gonoszoké nem. Ez az ezeréves uralom után következik, mert a Biblia szerint a végső ítélet lezárja a történelmet (<span class="verse-link" data-verse="Jelenések 20:12">Jelenések 20:12</span>).</p>
+                        <div class="verse-content" id="verse-Jelenések 20:12">
+                            <p><a href="https://wol.jw.org/hu/wol/b/r17/lp-h/nwtsty/66/20#study=discover&v=66:20:12" target="_blank">Jelenések 20:12</a></p>
+                            <p>És láttam a halottakat... könyveket nyitottak meg.</p>
+                        </div>
+                        <p>Ez az almenüpont az ezer év utáni időszakra illik, mert az ítélet az utolsó esemény a történelemben.</p>
+                    </div>
+                </div>
+                <div class="sub-menu">
+                    <div class="sub-menu-header">Új ég és új föld</div>
+                    <div class="sub-menu-content">
+                        <p>Isten új eget és új földet teremt, ahol igazság lakik, a halál, gyász és fájdalom eltűnik, és az új Jeruzsálem alászáll, hogy Isten az emberiséggel sátorozzon. Ez a végső ítélet után történik, mert a Biblia szerint az új teremtés a történelem megújulása (<span class="verse-link" data-verse="Jelenések 21:4">Jelenések 21:4</span>).</p>
+                        <div class="verse-content" id="verse-Jelenések 21:4">
+                            <p><a href="https://wol.jw.org/hu/wol/b/r17/lp-h/nwtsty/66/21#study=discover&v=66:21:4" target="_blank">Jelenések 21:4</a></p>
+                            <p>És Isten letöröl minden könnyet a szemükről...</p>
+                        </div>
+                        <p>Ez az esemény az ítélet utáni időszakra esik, mert az új ég és föld a végső beteljesedés.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.querySelectorAll('.main-menu-header').forEach(header => {
+            header.addEventListener('click', () => {
+                const content = header.nextElementSibling;
+                content.classList.toggle('open');
+            });
+        });
+
+        document.querySelectorAll('.sub-menu-header').forEach(header => {
+            header.addEventListener('click', () => {
+                const content = header.nextElementSibling;
+                content.classList.toggle('open');
+            });
+        });
+
+        document.querySelectorAll('.verse-link').forEach(link => {
+            link.addEventListener('click', () => {
+                const verse = link.getAttribute('data-verse');
+                const content = document.getElementById(`verse-${verse}`);
+                if (content) {
+                    content.classList.toggle('open');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
