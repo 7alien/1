@@ -192,20 +192,18 @@
     </style>
 </head>
 <body>
-    <script>
-    const correctPassword = "haha";
+     <script>
+    const encodedPassword = "Nzc3"; // "777" base64-ben
 
-    // Alapból rejtve van az oldal, csak script után jelenik meg
-    document.body.style.display = "none";
+    // Visszafejtjük a base64 kódot
+    const decodedPassword = atob(encodedPassword);
 
-    const userInput = prompt("pass:");
+    const userInput = prompt("Pass");
 
-    if (userInput === correctPassword) {
-      // Ha helyes a jelszó, mutatjuk az oldalt
-      document.body.style.display = "block";
+    if (userInput === decodedPassword) {
+      document.body.style.display = "block"; // Megmutatjuk az oldalt
     } else {
-      // Ha nem jó vagy cancel, csak üzenetet mutatunk
-      document.body.innerHTML = "<h1></h1>";
+      document.body.innerHTML = "<h1>no</h1>";
     }
   </script>
     <div class="container">
